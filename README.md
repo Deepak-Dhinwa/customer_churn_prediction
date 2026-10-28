@@ -1,5 +1,8 @@
 # Customer Churn Prediction
 
+One-page summary: open `poster.html` in a browser.
+Start: `.\run.ps1`
+
 ## Problem Statement (in my words)
 
 Telecom companies constantly lose customers – this silent churn bleeds revenue. The goal here was to **understand why customers churn** and build a model to predict churn probability, so the company can act **before losing valuable users**.
@@ -95,29 +98,31 @@ These features are **actionable**. For example, providing onboarding offers to n
 
 ## Project Structure
 
-customer_churn/
-│
-├── app/
-│ ├── train.py # Model training script
-│ ├── predict.py # FastAPI prediction script
-│ └── data_processing.py # Data cleaning and feature engineering utils
-├── customer_churn.ipynb # Full EDA, preprocessing, modeling, evaluation
-├── churn_model.pkl # Trained model weights
-├── requirements.txt # Dependencies
+```
+customer_churn_prediction/
+├── customer_churn.ipynb
+├── WA_Fn-UseC_-Telco-Customer-Churn.csv
+├── churn_stack_pipeline.pkl          # saved stacking pipeline used by the API
+├── project/
+│   ├── data_processing.py
+│   ├── predict.py
+│   ├── train_model.py
+│   ├── models/lgb_model.pkl          # separate LightGBM model from train_model.py
+│   └── app/main.py                   # FastAPI app
 └── README.md
-
----
-
-## Minimal Usage
-
-## Install dependencies
-
-```bash
-pip install -r requirements.txt
-uvicorn app.predict:app --reload
 ```
 
-## Make predictions
+The virtual environment for this project is the `customer_churn/` folder.
 
-Send a POST request with customer data to the /predict endpoint. Receive churn probability and classification for operational deployment or CRM integration.
+## Run the API
+
+From `project/`, using that environment:
+
+```bash
+..\customer_churn\Scripts\python.exe -m uvicorn app.main:app --port 8000
+```
+
+`POST /predict` with `{"data": [ {customer fields...}, ... ]}`. The response has `Churn_Pred` and `Churn_Prob`.
+
+The API scores with `churn_stack_pipeline.pkl`. That pipeline already contains the scaler and one-hot encoder, so new rows keep a stable encoding. `project/models/lgb_model.pkl` is the separate LightGBM file produced by `train_model.py`.
 
