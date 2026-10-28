@@ -5,20 +5,25 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Telecom Churn</title>
 <style>
-:root { --ink:#1c1915; --muted:#5c564c; --line:#d9d1c3; --paper:#f6f1e7; --card:#fffdf8; --accent:#6B3A4A; }
+
+:root { --ink:#1c1915; --muted:#5c564c; --line:#d9d1c3; --paper:#f6f1e7; --card:#fffdf8; --accent:#1E3A5F; }
 * { box-sizing:border-box; }
 body { margin:0; background:#e7e1d6; color:var(--ink); font-family:Georgia, "Iowan Old Style", serif; }
 .sheet { max-width:1180px; margin:28px auto; background:var(--paper); border:1px solid var(--line); }
-.band { display:grid; grid-template-columns:1.25fr 1fr 0.9fr; border-top:1px solid var(--line); }
-.band section { padding-bottom:18px; }
-header { display:flex; justify-content:space-between; gap:24px; padding:28px 32px 18px; border-bottom:3px solid var(--accent); }
+header { display:flex; justify-content:space-between; gap:24px; padding:26px 32px 16px; border-bottom:3px solid var(--accent); }
 h1 { font-size:34px; line-height:1.05; margin:0 0 8px; letter-spacing:-0.4px; }
-.claim { margin:0; font-family:"Segoe UI", sans-serif; font-size:16px; color:var(--muted); max-width:680px; }
+.claim { margin:0; font-family:"Segoe UI", sans-serif; font-size:16px; color:var(--muted); max-width:720px; }
 .kicker { font-family:"Segoe UI", sans-serif; font-size:12px; letter-spacing:0.14em; text-transform:uppercase; color:var(--accent); margin:0 0 8px; }
 .tags { font-family:"Segoe UI", sans-serif; font-size:12px; text-align:right; color:var(--muted); }
 .tags span { display:inline-block; border:1px solid var(--line); padding:4px 8px; margin:0 0 6px 6px; background:var(--card); }
-.grid { display:grid; grid-template-columns:1.1fr 1fr 0.9fr; }
-section { padding:22px 24px 8px; border-right:1px solid var(--line); }
+.path { display:grid; grid-template-columns:repeat(4,1fr); list-style:none; margin:0; padding:0; border-bottom:1px solid var(--line); }
+.path li { padding:12px 16px 14px; border-right:1px solid var(--line); }
+.path li:last-child { border-right:0; }
+.path b { display:block; font-family:"Segoe UI", sans-serif; font-size:11px; letter-spacing:0.12em; color:var(--accent); margin-bottom:4px; }
+.path span { font-family:"Segoe UI", sans-serif; font-size:13.5px; line-height:1.35; }
+.grid, .band { display:grid; grid-template-columns:1.15fr 1fr 0.9fr; }
+.band { border-top:1px solid var(--line); }
+section { padding:18px 22px 8px; border-right:1px solid var(--line); }
 section:last-child { border-right:0; }
 h2 { font-family:"Segoe UI", sans-serif; font-size:12px; letter-spacing:0.16em; text-transform:uppercase; margin:0 0 10px; color:var(--accent); }
 p, li { font-family:"Segoe UI", sans-serif; font-size:14.5px; line-height:1.45; }
@@ -26,35 +31,82 @@ ul { margin:0; padding-left:18px; }
 .stat { border-top:1px solid var(--line); padding:10px 0; }
 .stat b { display:block; font-size:26px; font-family:Georgia, serif; }
 .stat span { font-family:"Segoe UI", sans-serif; font-size:12px; color:var(--muted); }
-footer { display:flex; justify-content:space-between; gap:20px; padding:16px 32px 22px; border-top:1px solid var(--line); font-family:"Segoe UI", sans-serif; font-size:14px; }
+.out { font-family:Consolas, monospace; font-size:12.5px; line-height:1.55; background:var(--card); border:1px solid var(--line); padding:10px 12px; margin:0 0 8px; white-space:pre-wrap; }
+.shots { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; padding:8px 22px 18px; border-top:1px solid var(--line); }
+.shots.one { grid-template-columns:1fr; }
+.shots.two { grid-template-columns:1.15fr 1fr; }
+.shots figure { margin:0; background:var(--card); border:1px solid var(--line); }
+.shots img { width:100%; height:190px; object-fit:contain; background:#fff; display:block; }
+.shots.one img { height:280px; }
+.shots figcaption { font-family:"Segoe UI", sans-serif; font-size:12px; color:var(--muted); padding:6px 8px 8px; }
+.next { margin:0; padding:12px 28px 16px; border-top:1px solid var(--line); font-family:"Segoe UI", sans-serif; font-size:13.5px; color:var(--muted); line-height:1.45; }
+.next b { color:var(--ink); font-weight:600; }
+footer { display:flex; justify-content:space-between; gap:20px; padding:16px 28px 22px; border-top:1px solid var(--line); font-family:"Segoe UI", sans-serif; font-size:14px; }
 code { font-family:Consolas, monospace; background:var(--card); border:1px solid var(--line); padding:2px 6px; }
-@media (max-width:800px) { .grid, .band { grid-template-columns:1fr; } section { border-right:0; border-bottom:1px solid var(--line); } header, footer { display:block; } .tags { text-align:left; margin-top:12px; } }
+@media (max-width:800px) {
+  .grid, .band, .path, .shots, .shots.two { grid-template-columns:1fr; }
+  section { border-right:0; border-bottom:1px solid var(--line); }
+  header, footer { display:block; }
+  .tags { text-align:left; margin-top:12px; }
+}
+
 </style>
 </head>
 <body>
 <article class="sheet">
+
   <header>
     <div>
       <p class="kicker">Built API</p>
       <h1>Telecom Churn</h1>
-      <p class="claim">About one in four customers leave. The ones who leave are concentrated in the first year and on month-to-month contracts.</p>
+      <p class="claim">About one customer in four leaves. They cluster in the first year, on month-to-month contracts, paying by electronic check.</p>
     </div>
     <div class="tags"><span>ROC-AUC 0.84</span><span>FastAPI</span><span>SHAP</span></div>
   </header>
+  <ol class="path">
+    <li><b>01 · Clean</b><span>Total charges arrives as text. Tenure is cut into bands a person can name.</span></li>
+    <li><b>02 · Combine</b><span>A value feature, and contract crossed with payment method, because those two travel together.</span></li>
+    <li><b>03 · Balance the fit</b><span>SMOTE only on the training fold, so the test still looks like real customers.</span></li>
+    <li><b>04 · Freeze the pipe</b><span>Scaler, encoder, and stack are one file. The API cannot encode a new row a different way.</span></li>
+  </ol>
   <div class="grid">
-    <section><h2>Question</h2><ul><li>Who is about to cancel, and which contract terms make that likely?</li><li>The label is imbalanced, and total charges arrives as text.</li></ul></section>
-    <section><h2>Method</h2><ul><li>Tenure bands, a value feature, and a contract-by-payment interaction.</li><li>SMOTE on the training fold, then a stacking pipeline saved as one file.</li><li>The API scores new rows with that pipeline, so the encoding does not drift.</li></ul></section>
-    <section><h2>Evidence</h2><div class="stat"><b>26%</b><span>customers who churn</span></div><div class="stat"><b>0.84</b><span>ROC-AUC</span></div><div class="stat"><b>POST /predict</b><span>live score</span></div></section>
+    <section><h2>Question</h2><ul>
+      <li>Who is about to cancel, and which contract terms travel with that?</li>
+      <li>The label is uneven: most people stay.</li>
+    </ul></section>
+    <section><h2>Why this path</h2><ul>
+      <li>A model on raw columns would treat “month-to-month” and “electronic check” as separate trivia. Together they are the pattern.</li>
+      <li>Saving the whole pipeline means a later score uses the same codes as training.</li>
+    </ul></section>
+    <section><h2>What held</h2>
+      <div class="stat"><b>26%</b><span>of customers churn</span></div>
+      <div class="stat"><b>0.84</b><span>ROC-AUC of the saved stack</span></div>
+      <div class="stat"><b>4</b><span>drivers SHAP keeps naming</span></div>
+    </section>
   </div>
   <div class="band">
-    <section><h2>What the result actually says</h2><ul><li>About 26% of customers churn, roughly one in four. The first 12 months and month-to-month contracts carry most of that.</li><li>SHAP names four drivers: short tenure, month-to-month contract, monthly charges, and electronic check.</li><li>The API scores with churn_stack_pipeline.pkl. The scaler and the one-hot encoder are inside that file, so a new row is encoded the same way as training.</li></ul></section>
-    <section><h2>What it does not show</h2><ul><li>0.84 ROC-AUC separates likely churners from the rest. It does not say which offer would keep them.</li><li>SMOTE balanced the training fold. The live score is still a probability on the original mix of customers.</li></ul></section>
-    <section><h2>Beside the other attempts</h2><ul><li>Logistic regression about 0.80. Random forest and XGBoost about 0.83. The stack of those three is about 0.84.</li><li>The lift from stacking is small. The useful part is the reason code from SHAP, not the third decimal of AUC.</li></ul></section>
+    <section><h2>Reading the result</h2><ul>
+      <li>Short tenure, month-to-month contract, monthly charges, and electronic check are the four reasons the model repeats.</li>
+      <li>0.84 separates likely leavers from the rest. It does not say which offer would keep them.</li>
+      <li>Logistic regression was about 0.80. A single tree model was about 0.83. The stack adds a small step, and the reason codes are the useful part.</li>
+    </ul></section>
+    <section><h2>A real output</h2>
+      <div class="out">POST /predict
+row 1   churn   probability 0.82
+row 2   stay    probability 0.10</div>
+      <p>Those two rows are the first customers in the public table, scored by the saved pipeline.</p>
+    </section>
+    <section><h2>What the API loads</h2><ul>
+      <li><code>churn_stack_pipeline.pkl</code> is the live model.</li>
+      <li>A separate LightGBM file from training is kept and is not what <code>/predict</code> calls.</li>
+    </ul></section>
   </div>
+  <p class="next"><b>Scope.</b> A probability on this customer table. Turning it into a retention offer is the next decision, outside the model.</p>
   <footer>
-    <div><h2>Stack</h2><p>pandas, scikit-learn stacking, SMOTE, SHAP, FastAPI. A separate LightGBM file from train_model.py is not what the API loads.</p></div>
-    <div><h2>Look at it</h2><p>Run <code>.\run.ps1</code>. Docs are at <code>http://127.0.0.1:8000/docs</code>.</p></div>
+    <div><h2>Stack</h2><p>pandas, scikit-learn stacking, SMOTE, SHAP, FastAPI.</p></div>
+    <div><h2>Look at it</h2><p>Run <code>.\run.ps1</code>. Docs at <code>http://127.0.0.1:8000/docs</code>.</p></div>
   </footer>
+
 </article>
 </body>
 </html>
