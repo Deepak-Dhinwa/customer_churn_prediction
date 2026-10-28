@@ -8,7 +8,9 @@
 :root { --ink:#1c1915; --muted:#5c564c; --line:#d9d1c3; --paper:#f6f1e7; --card:#fffdf8; --accent:#6B3A4A; }
 * { box-sizing:border-box; }
 body { margin:0; background:#e7e1d6; color:var(--ink); font-family:Georgia, "Iowan Old Style", serif; }
-.sheet { max-width:1100px; margin:28px auto; background:var(--paper); border:1px solid var(--line); }
+.sheet { max-width:1180px; margin:28px auto; background:var(--paper); border:1px solid var(--line); }
+.band { display:grid; grid-template-columns:1.25fr 1fr 0.9fr; border-top:1px solid var(--line); }
+.band section { padding-bottom:18px; }
 header { display:flex; justify-content:space-between; gap:24px; padding:28px 32px 18px; border-bottom:3px solid var(--accent); }
 h1 { font-size:34px; line-height:1.05; margin:0 0 8px; letter-spacing:-0.4px; }
 .claim { margin:0; font-family:"Segoe UI", sans-serif; font-size:16px; color:var(--muted); max-width:680px; }
@@ -26,7 +28,7 @@ ul { margin:0; padding-left:18px; }
 .stat span { font-family:"Segoe UI", sans-serif; font-size:12px; color:var(--muted); }
 footer { display:flex; justify-content:space-between; gap:20px; padding:16px 32px 22px; border-top:1px solid var(--line); font-family:"Segoe UI", sans-serif; font-size:14px; }
 code { font-family:Consolas, monospace; background:var(--card); border:1px solid var(--line); padding:2px 6px; }
-@media (max-width:800px) { .grid { grid-template-columns:1fr; } section { border-right:0; border-bottom:1px solid var(--line); } header, footer { display:block; } .tags { text-align:left; margin-top:12px; } }
+@media (max-width:800px) { .grid, .band { grid-template-columns:1fr; } section { border-right:0; border-bottom:1px solid var(--line); } header, footer { display:block; } .tags { text-align:left; margin-top:12px; } }
 </style>
 </head>
 <body>
@@ -44,8 +46,13 @@ code { font-family:Consolas, monospace; background:var(--card); border:1px solid
     <section><h2>Method</h2><ul><li>Tenure bands, a value feature, and a contract-by-payment interaction.</li><li>SMOTE on the training fold, then a stacking pipeline saved as one file.</li><li>The API scores new rows with that pipeline, so the encoding does not drift.</li></ul></section>
     <section><h2>Evidence</h2><div class="stat"><b>26%</b><span>customers who churn</span></div><div class="stat"><b>0.84</b><span>ROC-AUC</span></div><div class="stat"><b>POST /predict</b><span>live score</span></div></section>
   </div>
+  <div class="band">
+    <section><h2>What the result actually says</h2><ul><li>About 26% of customers churn, roughly one in four. The first 12 months and month-to-month contracts carry most of that.</li><li>SHAP names four drivers: short tenure, month-to-month contract, monthly charges, and electronic check.</li><li>The API scores with churn_stack_pipeline.pkl. The scaler and the one-hot encoder are inside that file, so a new row is encoded the same way as training.</li></ul></section>
+    <section><h2>What it does not show</h2><ul><li>0.84 ROC-AUC separates likely churners from the rest. It does not say which offer would keep them.</li><li>SMOTE balanced the training fold. The live score is still a probability on the original mix of customers.</li></ul></section>
+    <section><h2>Beside the other attempts</h2><ul><li>Logistic regression about 0.80. Random forest and XGBoost about 0.83. The stack of those three is about 0.84.</li><li>The lift from stacking is small. The useful part is the reason code from SHAP, not the third decimal of AUC.</li></ul></section>
+  </div>
   <footer>
-    <div><h2>What came out of it</h2><ul><li>Month-to-month and the first 12 months carry the risk.</li><li>SHAP is what turns the score into a reason a retention team can use.</li></ul></div>
+    <div><h2>Stack</h2><p>pandas, scikit-learn stacking, SMOTE, SHAP, FastAPI. A separate LightGBM file from train_model.py is not what the API loads.</p></div>
     <div><h2>Look at it</h2><p>Run <code>.\run.ps1</code>. Docs are at <code>http://127.0.0.1:8000/docs</code>.</p></div>
   </footer>
 </article>
